@@ -1,0 +1,66 @@
+*{
+    font-family: 'Vollkorn', serif;
+}
+
+.login{
+    text-align: center;
+    margin-top: 8%;
+    width: auto;
+    height: auto;
+
+}
+
+.login .container {
+    margin: auto;
+    width: 50%;
+    padding: 0;
+    align-items: center;
+    background-color: #007bff;
+    border: solid black 4px;
+}
+
+.login .container input{
+    margin:2%;
+    width: 50%;
+    padding: 2%;
+}
+
+.login .container button{
+    margin: 4%;
+    margin-top: 0;
+    width: 20%;
+}
+
+.fileContainer{
+    background-color: gray;
+    padding: 2%;
+    margin: auto;
+}
+
+.fileContainer h2{
+    font-weight: bold;
+
+}
+
+.fileContainer input{
+    border: solid black 4px;
+    width:100%;
+    margin-top: 2%;
+}
+
+.fileContainer progress{
+    width: 100%;
+    color: royalblue;
+    margin-top: 3%;
+}
+
+.fileContainer ul li{
+    margin: 2%;
+}
+
+.fileContainer ul li embed{
+    margin:4%;
+    height:25%;
+    width:25%;
+    border: 4px solid black;
+}

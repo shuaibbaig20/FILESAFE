@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>SignIn | SignUp</title>
+
+    <link rel="stylesheet" type="text/css" href="styles.css"/>
+    <link rel="preconnect" href="https://fonts.gstatic.com">
+    <link href="https://fonts.googleapis.com/css2?family=Vollkorn&display=swap" rel="stylesheet">
+  </head>
+  <body>
+    <nav class="navbar navbar-expand-sm bg-primary justify-content-center">
+      <h1>WELCOME TO FILESAFE</h1>
+    </nav>
+    <section class="login">
+    <div class="container">
+      <label><b>Enter Email Id, Eg: XXXXX@XXXX.com;</b></label>
+      <input type="email" placeholder="Email..." id="email" required><br/>  
+      <label><b>Enter Password, Minimum 6 characters</b></label>  
+      <input type="password" placeholder="Password..." id="password" required><br/> 
+
+      <button type="button" class="btn btn-dark" onClick="signUp()" id="signUp">SignUp</button>
+      <button type="button" class="btn btn-dark" onClick="signIn()" id="signIn">SignIn</button>
+    </div>
+  </section>
+
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/limonte-sweetalert2/6.6.9/sweetalert2.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/limonte-sweetalert2/6.6.9/sweetalert2.min.js"></script>
+
+    <script src="https://www.gstatic.com/firebasejs/8.0.2/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.0.2/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.0.2/firebase-database.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.0.2/firebase-storage.js"></script>
+    <script type="text/javascript" src="app.js"></script>
+  </body>
+</html>

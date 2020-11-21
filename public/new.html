@@ -1,0 +1,146 @@
+<html>
+    <head>
+        <title>FILESAFE</title>
+        <link rel="stylesheet" type="text/css" href="styles.css"/>
+        <link rel="preconnect" href="https://fonts.gstatic.com">
+        <link href="https://fonts.googleapis.com/css2?family=Vollkorn&display=swap" rel="stylesheet">
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/limonte-sweetalert2/6.6.9/sweetalert2.min.css">
+    </head>
+    <body>
+        <section class="navigation">
+            <nav class="navbar navbar-expand-sm bg-primary justify-content-center">
+                <h1>WELCOME TO FILESAFE</h1>
+                <button type="button" class="btn btn-dark" onClick="signOut()" id="signOut">SignOut</button>
+              </nav>
+        </section>
+
+        <div class="fileContainer">
+            <h2>Choose files to upload</h2>
+        <!-- add the input field and area for uploaded images to be displayed -->
+        <input id="files" name="files[]" type="file" multiple>
+        <progress id="progress-bar" min="0" max="100" value="0"><span id="progres"></span></progress>
+        <p id="p1">No files uploaded yet in this session!</p> 
+        <ul id="list"></ul>
+        </div>
+
+        <!-- Firebase SDK API -->
+        <script src="https://www.gstatic.com/firebasejs/4.9.1/firebase.js"></script>
+
+        <!-- The upload functionality -->
+        <script>
+            // setting an event listener on the file upload input button
+            document.getElementById('files').addEventListener('change', handleFileSelect, false);
+
+            // handle file upload called whenever files are selected
+            function handleFileSelect(event) {
+                var files = event.target.files;
+                for (var i = 0; i < files.length; i++) {
+                    file = files[i];
+                    uploadFile(file);
+                }
+            }
+
+    var firebaseConfig = {
+    apiKey: "AIzaSyC1NDMkJMWul67ZVv8nQhHjVY_Hkz2ZlHo",
+    authDomain: "filesafe-2020.firebaseapp.com",
+    databaseURL: "https://filesafe-2020.firebaseio.com",
+    projectId: "filesafe-2020",
+    storageBucket: "filesafe-2020.appspot.com",
+    messagingSenderId: "843510574179",
+    appId: "1:843510574179:web:af72b9bb5c2bc4376bdc56"
+};
+// Initialize Firebase
+firebase.initializeApp(firebaseConfig);
+
+            // initiate and create a reference to firebase storage
+            var storage = firebase.storage();
+            var storageRef = storage.ref();
+
+            // pushing files to Firebase storage
+            function uploadFile(file) {
+                // set file metadata
+                var metadata = {
+                    contentType: file.contentType
+                };
+            
+                // use Firebase push call to upload file to Firebase
+                var uploadTask = storageRef.child('images/' + file.name).put(file, metadata);
+            
+                // monitor Firebase upload prodress and catch errors
+                uploadTask.on(firebase.storage.TaskEvent.STATE_CHANGED, 
+                function(snapshot) {
+                    // calculate progress as a percentage
+                    var progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+                    console.log('Upload is ' + progress + '% done');
+                    document.getElementById("p1").innerHTML="Upload is " + progress + " % done";
+                    document.getElementById("progress-bar").value=progress;
+
+                    // check for a change in u0pload state
+                    switch(snapshot.state) {
+                        case firebase.storage.TaskState.PAUSED:
+                            console.log('Upload is paused');
+                            document.getElementById("p1").innerHTML="Upload is paused";
+                            break;
+                        case firebase.storage.TaskState.RUNNING:
+                            console.log('Upload is running');
+                            break;
+                    }
+                }, function(error) {
+                    // catch an error when it happens, note: there are more error codes
+                    switch(error.code) {
+                        case 'storage/bucket_not_found':
+                            console.log('The Bucket for this storage could not be found');
+                            break;
+                        case 'storage/unauthorized':
+                            console.log('User doesn\'t have access');
+                            break;
+                        case 'storage/cancelled':
+                            console.log('User cancelled the upload process');
+                            break;
+                        case 'storage/unknown':
+                            console.log('Unknown error');
+                            break;
+                    }
+                return;
+                }, function() {
+                    // on success, display the uploaded image on the page
+                    document.getElementById("p1").innerHTML="Upload is completed";
+                    var downloadURL = uploadTask.snapshot.downloadURL;
+                    console.log('the image uploaded and can be found at ' + downloadURL);
+
+                    var filelist = document.getElementById('list');
+                    var newFileListElement = document.createElement('li');
+                    var fileImage = document.createElement('embed');
+                    fileImage.src = downloadURL;
+                    newFileListElement.appendChild(fileImage);
+                    filelist.appendChild(newFileListElement);
+                })
+            }
+        </script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/limonte-sweetalert2/6.6.9/sweetalert2.min.js"></script>
+        <script>function signOut(){
+            firebase.auth().signOut().then(function() {
+                // Sign-out successful.
+                swal({
+                    type: 'successfull',
+                    title: 'Signed Out', 
+                }).then((value) => {
+                    setTimeout(function(){
+                        window.location.replace("index.html");
+                    }, 1000)
+                });
+            }).catch(function(error) {
+                // An error happened.
+                let errorMessage = error.message;
+                swal({
+                    type: 'error',
+                    title: 'Error',
+                    text: errorMessage,
+                })
+            });
+        }
+        </script>
+    </body>
+</html>
