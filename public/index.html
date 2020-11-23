@@ -8,6 +8,7 @@
     <link rel="stylesheet" type="text/css" href="styles.css"/>
     <link rel="preconnect" href="https://fonts.gstatic.com">
     <link href="https://fonts.googleapis.com/css2?family=Vollkorn&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/material-design-iconic-font/2.2.0/css/material-design-iconic-font.min.css">
   </head>
   <body>
     <nav class="navbar navbar-expand-sm bg-primary justify-content-center">
@@ -15,10 +16,14 @@
     </nav>
     <section class="login">
     <div class="container">
-      <label><b>Enter Email Id, Eg: XXXXX@XXXX.com;</b></label>
-      <input type="email" placeholder="Email..." id="email" required><br/>  
+      <label><b>Enter Email Id, Eg: XXXX@XXXX.com;</b></label>
+      <i class="zmdi zmdi-email"></i>
+      <input type="email" placeholder="Email..." id="email" required>
+      <br/>  
       <label><b>Enter Password, Minimum 6 characters</b></label>  
-      <input type="password" placeholder="Password..." id="password" required><br/> 
+      <i class="zmdi zmdi-lock"></i>
+      <input type="password" placeholder="Password..." id="password" required>
+      <br/> 
 
       <button type="button" class="btn btn-dark" onClick="signUp()" id="signUp">SignUp</button>
       <button type="button" class="btn btn-dark" onClick="signIn()" id="signIn">SignIn</button>

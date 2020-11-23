@@ -11,7 +11,8 @@ var firebaseConfig = {
 // Initialize Firebase
 firebase.initializeApp(firebaseConfig);
 
-const auth = firebase.auth();
+var auth = firebase.auth();
+var database = firebase.database();
 
 
 // xxxxxxxxxxxxxxxxxxxxxxxxxx Email Validation xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
@@ -44,18 +45,16 @@ function signUp(){
       return checkUserPassword();
   }else{
       firebase.auth().createUserWithEmailAndPassword(userEmail, userPassword).then((success) => {
-          var user = firebase.auth().currentUser;
-          var uid;
-          if (user != null) {
-              uid = user.uid;
-          }
-          var firebaseRef = firebase.database().ref();
+
+          var firebaseRef = firebase.database().ref().child("Users");
+          var userID = firebase.auth().currentUser.uid;
+          var usersRef = firebaseRef.child(userID);
           var userData = {
-              userEmail: email,
-              userPassword: password
-          }
-          firebaseRef.child(uid).set(userData);
-          swal('Your Account Created','Your account was created successfully, you can log in now.',
+              "userEmail": userEmail,
+              "userPassword": userPassword
+          };
+          firebaseRef.set(userData);
+          swal('Your Account Created'," ",'Your account was created successfully, you can log in now.',
           ).then((value) => {
               setTimeout(function(){
                   window.location.replace("new.html");

@@ -31,6 +31,10 @@
     width: 20%;
 }
 
+.navigation nav .navbar button{
+    margin-right: 0;
+}
+
 .fileContainer{
     background-color: gray;
     padding: 2%;
