@@ -24,12 +24,17 @@
         <ul id="list"></ul>
         </div>
 
+        <div id="img-area"></div>
+
         <div class="displayContainer">
-            <h3 id="H3">Files uploaded by user</h3>
+            <button type="button" class="btn btn-dark" onClick="display()" id="display">VIEW FILES</button> 
             <ol id="displayList"></ol>
         </div>
-        
-        <script src="https://www.gstatic.com/firebasejs/4.9.1/firebase.js"></script>
+
+        <script src="https://www.gstatic.com/firebasejs/8.0.2/firebase-app.js"></script>
+        <script src="https://www.gstatic.com/firebasejs/8.0.2/firebase-auth.js"></script>
+        <script src="https://www.gstatic.com/firebasejs/8.0.2/firebase-database.js"></script>
+        <script src="https://www.gstatic.com/firebasejs/8.0.2/firebase-storage.js"></script>
         <script>
             
             document.getElementById('files').addEventListener('change', handleFileSelect, false);
@@ -60,7 +65,9 @@ firebase.initializeApp(firebaseConfig);
             function uploadFile(file) {
                 
                 var metadata = {
-                    contentType: file.contentType
+                    contentType: file.contentType,
+                    duration: file.duration,
+                    owner: file.currentUser
                 };
                 var uid;
                 console.log(firebase.auth().currentUser.uid)
@@ -71,8 +78,8 @@ firebase.initializeApp(firebaseConfig);
                 function(snapshot) {
 
                     var progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-                    console.log('Upload is ' + progress + '% done');
-                    document.getElementById("p1").innerHTML="Upload is " + progress + " % done";
+                    console.log('Uploading: ' + Math.round(progress) + '% done');
+                    document.getElementById("p1").innerHTML="Uploading: " + Math.round(progress) + " % done";
                     document.getElementById("progress-bar").value=progress;
 
                     switch(snapshot.state) {
@@ -89,32 +96,66 @@ firebase.initializeApp(firebaseConfig);
                     switch(error.code) {
                         case 'storage/bucket_not_found':
                             console.log('The Bucket for this storage could not be found');
+                            document.getElementById("p1").innerHTML=error.message;
                             break;
                         case 'storage/unauthorized':
                             console.log('User doesn\'t have access');
+                            document.getElementById("p1").innerHTML=error.message+" cannot upload files smaller than 100MB";
                             break;
                         case 'storage/cancelled':
                             console.log('User cancelled the upload process');
+                            document.getElementById("p1").innerHTML=error.message;
                             break;
                         case 'storage/unknown':
                             console.log('Unknown error');
+                            document.getElementById("p1").innerHTML=error.message;
                             break;
                     }
                 return;
-                }, function() {
+                }, function(snapshot) {
                     
-                    var downloadURL = uploadTask.snapshot.downloadURL;
-                    console.log('the file is uploaded and can be found at ' + downloadURL);
-                    document.getElementById("p1").innerHTML="the file is uploaded and  ";
+                    var downloadURL = uploadTask.snapshot.ref.getDownloadURL().then(function(downloadURL){
+                    console.log('file available at ',downloadURL);
+                    document.getElementById("p1").innerHTML="the file is uploaded and can be downloaded below ";
                     var filelist = document.getElementById('list');
                     var newFileListElement = document.createElement('li');
                     var fileObj = document.createElement('embed');
                     fileObj.src = downloadURL;
                     newFileListElement.appendChild(fileObj);
                     filelist.appendChild(newFileListElement);
-                })
-            }
-        </script>
+                    });   
+            },
+    )};
+        function display(){
+            var result,fileRef;
+                var userID = firebase.auth().currentUser.uid;
+                console.log("running...", userID);
+                var listRef = firebase.storage().ref().child(userID+"/");
+                console.log(listRef.toString());
+                listRef.listAll().then(function(result) {
+                result.items.forEach(function(fileRef) {
+                    fileRef.getDownloadURL().then(function(url) {
+                    console.log("running...");
+                    var filelist = document.getElementById('displayList');
+                    var newFileListElement = document.createElement('li');
+                    var fileObj = document.createElement('embed');
+                    fileObj.src = url;
+                    newFileListElement.appendChild(fileObj);
+                    filelist.appendChild(newFileListElement);
+            }).catch(function(error) {
+            console.log(error.code,error.message);
+            alert(error.code,error.message);
+        })
+        }).catch(function(error) {
+            console.log(error.code,error.message);
+            alert(error.code,error.message);
+        })
+        }).catch(function(error) {
+            console.log(error.code,error.message);
+    })
+};
+
+</script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/limonte-sweetalert2/6.6.9/sweetalert2.min.js"></script>
         <script>function signOut(){
             firebase.auth().signOut().then(function() {

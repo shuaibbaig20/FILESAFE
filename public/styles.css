@@ -58,11 +58,39 @@
     margin-top: 3%;
 }
 
+.fileContainer #p1{
+    color: whitesmoke;
+    font-weight: bold;
+}
+
 .fileContainer ul li{
     margin: 2%;
 }
 
 .fileContainer ul li embed{
+    margin:4%;
+    height:25%;
+    width:25%;
+    border: 4px solid black;
+}
+
+.displayContainer{
+    background-color: #007bff;
+    padding: 2%;
+}
+
+.displayContainer button{
+    margin-left: 46%;
+    margin-right: 46%;
+    margin-top : 5%;
+    margin-bottom: 5%;
+}
+
+.displayContainer ol li{
+    margin: 2%;
+}
+
+.displayContainer ol li embed{
     margin:4%;
     height:25%;
     width:25%;
