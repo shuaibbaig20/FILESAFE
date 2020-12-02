@@ -55,10 +55,16 @@
 .fileContainer progress{
     width: 100%;
     color: royalblue;
-    margin-top: 3%;
+    margin-top: 2%;
 }
 
 .fileContainer #p1{
+    color: whitesmoke;
+    font-weight: bold;
+}
+
+.fileContainer #size{
+    margin: 1%;
     color: whitesmoke;
     font-weight: bold;
 }
@@ -77,6 +83,7 @@
 .displayContainer{
     background-color: #007bff;
     padding: 2%;
+    display: block;
 }
 
 .displayContainer button{
@@ -86,13 +93,57 @@
     margin-bottom: 5%;
 }
 
-.displayContainer ol li{
-    margin: 2%;
+
+.displayContainer table tr{
+    text-align: center;
 }
 
-.displayContainer ol li embed{
-    margin:4%;
-    height:25%;
-    width:25%;
+.displayContainer table tr td{
+    margin: 0;
+    width: 20%;
+    text-align: center;
+    border: solid black 4px;
+}
+
+.displayContainer table tr td embed{
+    margin: 0;
+    height: 20%;
+    width: 100%;
     border: 4px solid black;
+}
+
+.displayContainer table tr td p{
+    width: auto;
+    color: white;
+    font-weight: bold;
+}
+
+.displayContainer table tr td a{
+    width: auto;
+    border: 1px solid transparent #343a40;
+    padding: .375rem .75rem;
+    font-size: 1rem;
+    color: white;
+    background-color: #343a40;
+}
+
+.displayContainer table tr td button{
+    margin: 0%;
+    width: auto;
+}
+
+.displayContainer #searchList{
+    margin-bottom:2%;
+}
+
+.displayContainer #searchList tr td{
+    border: 4px solid white;
+}
+
+.displayContainer #searchList tr td input{
+    width:100%;
+}
+
+.displayContainer #searchList tr td button{
+    width:100%;
 }

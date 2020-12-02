@@ -4,6 +4,7 @@
         <link rel="stylesheet" type="text/css" href="styles.css"/>
         <link rel="preconnect" href="https://fonts.gstatic.com">
         <link href="https://fonts.googleapis.com/css2?family=Vollkorn&display=swap" rel="stylesheet">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
         <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
 
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/limonte-sweetalert2/6.6.9/sweetalert2.min.css">
@@ -13,22 +14,22 @@
             <nav class="navbar navbar-expand-sm bg-primary justify-content-center">
                 <h1>WELCOME TO FILESAFE</h1>
                 <button type="button" class="btn btn-dark" onClick="signOut()" id="signOut">SignOut</button>
-              </nav>
-            </div>
+            </nav>
+        </div>
 
         <div class="fileContainer">
-            <h2>Choose files to upload</h2>
+        <h2>Choose files to upload</h2>
         <input id="files" name="files[]" type="file" multiple>
+        <p id="size">File size</p>
         <progress id="progress-bar" min="0" max="100" value="0"><span id="progres"></span></progress>
         <p id="p1">No files uploaded yet in this session!</p> 
         <ul id="list"></ul>
         </div>
 
-        <div id="img-area"></div>
-
         <div class="displayContainer">
             <button type="button" class="btn btn-dark" onClick="display()" id="display">VIEW FILES</button> 
-            <ol id="displayList"></ol>
+            <table id="searchList"></table>
+            <table id="displayList"></table>
         </div>
 
         <script src="https://www.gstatic.com/firebasejs/8.0.2/firebase-app.js"></script>
@@ -41,9 +42,15 @@
 
             function handleFileSelect(event) {
                 var files = event.target.files;
-                for (var i = 0; i < files.length; i++) {
-                    file = files[i];
-                    uploadFile(file);
+                for (var i = 0; i < files.length; i++) { 
+                    file=files[i];
+                    if((Math.round((file.size)/(1024*1024)))<100){
+                        alert("File size is too small, Min 100MB")
+                    }else{
+                        document.getElementById('size').innerHTML="File size is "+((file.size)/(1024*1024))+" MB";
+                        uploadFile(file);
+                    }
+
                 }
             }
 
@@ -66,8 +73,8 @@ firebase.initializeApp(firebaseConfig);
                 
                 var metadata = {
                     contentType: file.contentType,
-                    duration: file.duration,
-                    owner: file.currentUser
+                    owner: file.currentUser,
+
                 };
                 var uid;
                 console.log(firebase.auth().currentUser.uid)
@@ -127,32 +134,151 @@ firebase.initializeApp(firebaseConfig);
             },
     )};
         function display(){
-            var result,fileRef;
+            var list = document.getElementById('searchList');
+            var listElement1=document.createElement('tr');
+            var listElement2=document.createElement('td');
+            var listElement3=document.createElement('td');
+            var sBar=document.createElement('input');
+            sBar.type="text";
+            sBar.id="search";
+            sBar.placeholder="Search files by name";
+            var sBtn=document.createElement('button');
+            sBtn.type="submit";
+            sBtn.className="btn btn-dark";
+            sBtn.onclick=function(){
+                var result,fileRef,url,flag=0;
+                var userID = firebase.auth().currentUser.uid;
+                var listRef = firebase.storage().ref().child(userID+"/");
+                listRef.listAll().then(function(result) {
+                result.items.forEach(function(fileRef) {
+                fileRef.getMetadata().then(function(metadata){
+                var Name=metadata.name;
+                var sName=document.getElementById('search').value;
+                if(Name==sName){
+                    console.log("match");
+                    flag=1;
+                    fileRef.getDownloadURL().then(function(url) {
+                    var filelist = document.getElementById('searchList');
+                    var newFileListElement1 = document.createElement('tr');
+                    var newFileListElement2 = document.createElement('td');
+                    var newFileListElement3 = document.createElement('td');
+                    var newFileListElement4 = document.createElement('td');
+                    var newFileListElement5 = document.createElement('td');
+                    var newFileListElement6 = document.createElement('td');
+                    fileRef.getMetadata().then(function(metadata) {
+                    console.log(metadata);
+                    var fileName = document.createElement('p');
+                    fileName.innerText= metadata.name;
+                    newFileListElement3.appendChild(fileName);
+                    var fileDate = document.createElement('p');
+                    fileDate.innerText=metadata.timeCreated;
+                    newFileListElement4.appendChild(fileDate);
+                        }).catch(function(error) {
+                    console.log(error.message);
+                    alert(error.code,error.message);
+                    });
+                    var fileObj = document.createElement('embed');
+                    fileObj.src = url;
+                    newFileListElement2.appendChild(fileObj);                   
+                    var fileDownload= document.createElement('a');
+                    fileDownload.href = url;
+                    fileDownload.innerText="Download";
+                    newFileListElement5.appendChild(fileDownload); 
+                    var fileDelete = document.createElement('button');
+                    fileDelete.type='button';
+                    fileDelete.className="btn btn-dark"
+                    fileDelete.innerText="Delete";
+                    fileDelete.onclick=function(){
+                        fileRef.delete().then(function(){
+                        alert("Deleted successfully");
+                        setTimeout(function(){
+                        window.location.replace("new.html");
+                    }, 1000)
+                });
+                };
+                    newFileListElement6.appendChild(fileDelete);
+                    newFileListElement1.appendChild(newFileListElement2);
+                    newFileListElement1.appendChild(newFileListElement3);
+                    newFileListElement1.appendChild(newFileListElement4);
+                    newFileListElement1.appendChild(newFileListElement5);
+                    newFileListElement1.appendChild(newFileListElement6);
+                    filelist.appendChild(newFileListElement1);
+            });
+                }
+                else{
+                    console.log("not found");
+                }
+                });
+        });
+        }).catch(function(error) {
+            console.log(error.code,error.message);
+            alert(error.code,error.message);
+    });
+            };
+            sBtn.innerText="search";
+            listElement3.appendChild(sBtn);
+            listElement2.appendChild(sBar);
+            listElement1.appendChild(listElement2);
+            listElement1.appendChild(listElement3);
+            list.appendChild(listElement1);
+            var result,fileRef,url;
                 var userID = firebase.auth().currentUser.uid;
                 console.log("running...", userID);
                 var listRef = firebase.storage().ref().child(userID+"/");
-                console.log(listRef.toString());
                 listRef.listAll().then(function(result) {
                 result.items.forEach(function(fileRef) {
                     fileRef.getDownloadURL().then(function(url) {
                     console.log("running...");
                     var filelist = document.getElementById('displayList');
-                    var newFileListElement = document.createElement('li');
+                    var newFileListElement1 = document.createElement('tr');
+                    var newFileListElement2 = document.createElement('td');
+                    var newFileListElement3 = document.createElement('td');
+                    var newFileListElement4 = document.createElement('td');
+                    var newFileListElement5 = document.createElement('td');
+                    var newFileListElement6 = document.createElement('td');
+                    fileRef.getMetadata().then(function(metadata) {
+                    var fileName = document.createElement('p');
+                    fileName.innerText= metadata.name;
+                    newFileListElement3.appendChild(fileName);
+                    var fileDate = document.createElement('p');
+                    fileDate.innerText=metadata.timeCreated;
+                    newFileListElement4.appendChild(fileDate);
+                        }).catch(function(error) {
+                    console.log(error.message);
+                    alert(error.code,error.message);
+                    });
                     var fileObj = document.createElement('embed');
                     fileObj.src = url;
-                    newFileListElement.appendChild(fileObj);
-                    filelist.appendChild(newFileListElement);
-            }).catch(function(error) {
-            console.log(error.code,error.message);
-            alert(error.code,error.message);
-        })
+                    newFileListElement2.appendChild(fileObj);                   
+                    var fileDownload= document.createElement('a');
+                    fileDownload.href = url;
+                    fileDownload.innerText="Download";
+                    newFileListElement5.appendChild(fileDownload); 
+                    var fileDelete = document.createElement('button');
+                    fileDelete.type='button';
+                    fileDelete.className="btn btn-dark"
+                    fileDelete.innerText="Delete";
+                    fileDelete.onclick=function(){
+                        fileRef.delete().then(function(){
+                        alert("Deleted successfully");
+                        setTimeout(function(){
+                        window.location.replace("new.html");
+                    }, 1000)
+                });
+                };
+                    newFileListElement6.appendChild(fileDelete);
+                    newFileListElement1.appendChild(newFileListElement2);
+                    newFileListElement1.appendChild(newFileListElement3);
+                    newFileListElement1.appendChild(newFileListElement4);
+                    newFileListElement1.appendChild(newFileListElement5);
+                    newFileListElement1.appendChild(newFileListElement6);
+                    filelist.appendChild(newFileListElement1);
+            });
+        });
         }).catch(function(error) {
             console.log(error.code,error.message);
             alert(error.code,error.message);
-        })
-        }).catch(function(error) {
-            console.log(error.code,error.message);
-    })
+    });
 };
 
 </script>
@@ -177,7 +303,7 @@ firebase.initializeApp(firebaseConfig);
                     text: errorMessage,
                 })
             });
-        }
+        };
         </script>
     </body>
 </html>
